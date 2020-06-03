@@ -1,37 +1,25 @@
-## Welcome to GitHub Pages
+## Command to show GPU RAM load for Mate panel
 
-You can use the [editor on GitHub](https://github.com/0xc0dab1e/0xc0dab1e.github.io/edit/master/index.md) to maintain and preview the content for your website in Markdown files.
+A Command Applet can be added to the Mate panel. It shows an output of a custom user-defined command, refreshed every second by default. The command I came up with to display GPU load:
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
-
-### Markdown
-
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
-
-```markdown
-Syntax highlighted code block
-
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
+```bash
+bash -c "nvidia-smi|sed -n 9p|grep -oE '[[:digit:]]+[[:alpha:]]+[[:blank:]][/][[:blank:]]+[[:alnum:]]+'"
 ```
+```markdown
+1. bash -c wraps the command, as applet does not accept pipes (|)
+2. nvidia-smi outputs a text table with GPU info
+3. sed -n 9p selects only line #9 with target info. This easies the task of the following grep
+4. grep -o to output not the whole line, but only regexed sequence
+5. -E to deploy slightly more complicated regex expression (same as --extended-regexp)
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+Target output is like "185MiB /  20040MiB" filtered from line which is like 
+| N/A   44C    P0    N/A /  N/A |    185MiB /  20040MiB |     41%      Default |
 
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/0xc0dab1e/0xc0dab1e.github.io/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+6.  [[:digit:]] for the staff that starts with numbers
+7.  + is for multiple characters of this kind
+7.  [[:alpha:]] for alphabetic chars
+8.  [[:blank:]] for space or tab
+9.  [/] for / symbol
+10. [[:alnum:]] for aplhanumeric
+```
+Perhaps not the most beautiful / optimal command, but it works. 
